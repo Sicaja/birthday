@@ -443,24 +443,24 @@ body{
    WATERMARK BADGE (Owner Signature)
    ============================================================ */
 .watermark{
-  position:absolute; left:18px; top:18px; z-index:7;
+  position:absolute; left:20px; top:18px; z-index:10;
   display:inline-flex; align-items:center; gap:5px;
-  padding:4px 10px; border-radius:999px;
+  padding:5px 12px; border-radius:999px;
   font-family:"Cormorant Garamond", Georgia, serif;
-  font-size:clamp(10px, 2vw, 12px);
+  font-size:clamp(11px, 2.2vw, 13px);
   font-weight:600;
   color:#6e3f4a;
-  background:rgba(255,248,242,.35);
-  border:1px solid rgba(150,60,80,.12);
-  box-shadow:0 4px 12px -4px rgba(120,20,50,.15);
+  background:rgba(255,248,242,.65);
+  border:1px solid rgba(150,60,80,.18);
+  box-shadow:0 4px 12px -4px rgba(120,20,50,.2);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   pointer-events:none;
   user-select:none;
-  opacity:0.6;
+  opacity:0.85;
   transition:opacity 0.3s ease, background 0.3s ease;
 }
-.watermark:hover{ opacity:0.95; background:rgba(255,248,242,.65); }
-.watermark__icon{ font-size:10px; color:#e8a23d; opacity:0.85; }
+.watermark:hover{ opacity:1; background:rgba(255,248,242,.85); }
+.watermark__icon{ font-size:11px; color:#e8a23d; opacity:0.9; }
 .watermark__heart{ color:#d4235c; }
 .watermark__author{ color:#9c0f42; font-weight:700; }
 
