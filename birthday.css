@@ -139,7 +139,7 @@ body{
    on a DIAGONAL. The whole rig (left/top + rotation around the grip) is set in
    JS from measured geometry; everything below is in the rig's own space. */
 .archery{
-  position:absolute; top:0; left:0;    /* JS sets left/top so the grip anchors */
+  position:absolute; top:68vh; left:18vw; /* default lower-left quadrant fallback */
   width:clamp(100px, 18vw, 168px);     /* smaller, daintier bow — delicate against the heart */
   cursor:grab;
   -webkit-tap-highlight-color:transparent;

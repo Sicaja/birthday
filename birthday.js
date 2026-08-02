@@ -719,9 +719,11 @@ function applyNock(){
 }
 
 function refreshRig(){
-  // Ensure valid viewport dimensions even on fast initial load
-  const winW = W || canvas.clientWidth || window.innerWidth || 1000;
-  const winH = H || canvas.clientHeight || window.innerHeight || 800;
+  // Always get real layout dimensions
+  const winW = canvas.clientWidth || window.innerWidth || W || 1000;
+  const winH = canvas.clientHeight || window.innerHeight || H || 800;
+  W = winW; H = winH;
+
   const gripX = winW * 0.24, gripY = winH * 0.76;
   const heartX = winW * 0.5, heartY = winH * 0.33;
 
@@ -729,34 +731,23 @@ function refreshRig(){
   pullUX = -Math.sin(aimRad); pullUY = Math.cos(aimRad);
 
   nockProxy.val = REST_NOCK; applyNock();
-  gsap.set(archery, { rotation: 0, scale: 1, x: 0, y: 0 });
-  archery.style.left = '0px'; archery.style.top = '0px';
-  gsap.set(arrow, { x: 0, y: 0 });
 
-  // Force layout read
-  void archery.offsetHeight;
-
-  const aR = archery.getBoundingClientRect();
-  const bR = bow.getBoundingClientRect();
-  const sR = serving.getBoundingClientRect();
-  const rR = arrow.getBoundingClientRect();
-
-  const bW = bR.width || archery.clientWidth || 150;
-  const bH = bR.height || (bW * (300 / 460));
+  // Measure bow container width deterministically
+  const bW = archery.clientWidth || (winW * 0.18) || 150;
+  const bH = bW * (300 / 460);
   svgScale = bW / 460;
 
-  const gripLX = (bR.left - aR.left) + 0.5 * bW;
-  const gripLY = (bR.top  - aR.top ) + (240 / 300) * bH;
-  const nockLX = (sR.left - aR.left) + 0.5 * (sR.width || 10);
-  const nockLY = (sR.top  - aR.top ) + 0.5 * (sR.height || 10);
+  const gripLX = bW * 0.5;
+  const gripLY = bH * (240 / 300);
+  const nockLY = bH * (96 / 300);
+  const rH = bH * (220 / 300);
 
-  const rW = rR.width || 30;
-  const rH = rR.height || 100;
-  arrowBaseX = nockLX - ((rR.left - aR.left) + 0.5 * rW);
-  arrowBaseY = nockLY - ((rR.top  - aR.top ) + (205 / 220) * rH);
+  arrowBaseX = 0;
+  arrowBaseY = nockLY - (rH * (205 / 220));
 
   archery.style.left = (gripX - gripLX) + 'px';
   archery.style.top  = (gripY - gripLY) + 'px';
+
   gsap.set(archery, { transformOrigin: `${gripLX}px ${gripLY}px`, rotation: aimRad * 180 / Math.PI });
   gsap.set(arrow, { x: arrowBaseX, y: arrowBaseY });
   maxDraw = Math.min(bH * 0.72, winH * 0.16, 132);
