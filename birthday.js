@@ -993,13 +993,28 @@ archery.addEventListener('pointermove', (e) => {
 function endDraw(){
   if (!drawing) return;
   drawing = false;
-  if (curDraw > maxDraw * 0.26) fire(); else springBack();
+  if (curDraw > maxDraw * 0.15) {
+    fire();
+  } else {
+    autoFire();
+  }
 }
 archery.addEventListener('pointerup', endDraw);
 archery.addEventListener('pointercancel', endDraw);
 archery.addEventListener('keydown', (e) => {
   if (played) return;
   if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); autoFire(); }
+});
+
+target.addEventListener('click', (e) => {
+  getAudioCtx();
+  if (!played) autoFire();
+});
+
+hero.addEventListener('click', (e) => {
+  if (e.target.closest('#watermark') || e.target.closest('#musicToggle') || e.target.closest('#replay')) return;
+  getAudioCtx();
+  if (!played && !drawing) autoFire();
 });
 
 /* boot Act 1: reveal the target + bow + hint, then start the beat */
