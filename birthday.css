@@ -1,10 +1,10 @@
 /* ============================================================
    HAPPY BIRTHDAY — a birthday film in four acts
    Vanilla + GSAP. One page, one continuous piece:
-     1. a beating heart you open with a tap
+    1. a rose you open with a tap
      2. it falls, and bursts into a flood of rose
      3. a kinetic wish hinges up out of that colour
-     4. a gold light blooms, and a tree grows into a heart
+    4. a gold light blooms, and a tree grows a crown of roses
    One grain + vignette lens sits over all of it.
    ============================================================ */
 
@@ -66,7 +66,7 @@ body{
   z-index:3;
   overflow:hidden;
 }
-/* the warm field the heart sits on */
+/* the warm field the rose sits on */
 .hero__bg{
   position:absolute; inset:0;
   background:
@@ -99,7 +99,7 @@ body{
   opacity:0;                          /* GSAP reveals */
 }
 
-/* ---- the target heart (GSAP animates .target on the hit → fall → burst) ---- */
+/* ---- the target rose (GSAP animates .target on the hit → fall → burst) ---- */
 .targetWrap{
   position:absolute; top:33%; left:0; right:0;
   display:flex; justify-content:center;
@@ -109,7 +109,7 @@ body{
 .target{
   position:relative;
   width:clamp(120px, 27vw, 208px);
-  aspect-ratio:100/92;
+  aspect-ratio:1;
   will-change:transform;
   transform-origin:50% 60%;
   pointer-events:auto;
@@ -117,7 +117,7 @@ body{
 }
 .target__heart{ position:absolute; inset:0; display:block; }
 
-/* radial bloom behind the heart — swells on the beat */
+/* radial bloom behind the rose — swells on the beat */
 .heart__glow{
   position:absolute; left:50%; top:52%;
   width:230%; aspect-ratio:1; transform:translate(-50%,-50%) scale(1);
@@ -137,12 +137,12 @@ body{
 }
 
 /* ---- the bow + arrow rig ----
-   Placed lower-left and rotated by JS to aim at the heart, so the shot travels
+  Placed lower-left and rotated by JS to aim at the rose, so the shot travels
    on a DIAGONAL. The whole rig (left/top + rotation around the grip) is set in
    JS from measured geometry; everything below is in the rig's own space. */
 .archery{
   position:absolute; top:68vh; left:18vw; /* default lower-left quadrant fallback */
-  width:clamp(100px, 18vw, 168px);     /* smaller, daintier bow — delicate against the heart */
+  width:clamp(100px, 18vw, 168px);     /* smaller, daintier bow — delicate against the rose */
   cursor:grab;
   -webkit-tap-highlight-color:transparent;
   touch-action:none;                   /* we own the drag gesture */
@@ -157,7 +157,7 @@ body{
   overflow:visible;
 }
 
-/* the aim line rides inside the rig, so it points straight at the heart */
+/* the aim line rides inside the rig, so it points straight at the rose */
 .aim{
   position:absolute; left:50%; bottom:32%;
   width:2px; height:190%; margin-left:-1px;
@@ -166,7 +166,7 @@ body{
   opacity:0; pointer-events:none;
 }
 
-/* the arrow overlaps the bow at the nock and flies to the heart */
+/* the arrow overlaps the bow at the nock and flies to the rose */
 .arrow{
   position:absolute; left:0; right:0; margin-inline:auto;
   bottom:36%;                          /* JS re-anchors the tail to the nock */
@@ -217,7 +217,7 @@ body{
   position:absolute; inset:0;
   z-index:4;                          /* below the flood; revealed once it covers */
   opacity:0;
-  /* purely decorative — must never intercept the tap on the heart beneath it.
+  /* purely decorative — must never intercept the tap on the rose beneath it.
      An opacity:0 element is still hit-testable, so without this the invisible
      field (z4, above the hero z3) swallows every Act-1 tap. */
   pointer-events:none;
@@ -353,6 +353,7 @@ body{
   font-family:"Cormorant Garamond", Georgia, serif;
   font-style:italic; font-weight:600;
   font-size:clamp(13px, 3.2vw, 24px);
+  line-height:1.4;
   letter-spacing:.05em; color:#9c4f63;
   text-shadow:0 1px 2px #fff8f1, 0 0 8px rgba(255,248,241,.95);
 }
@@ -372,7 +373,7 @@ body{
 .wish__hero{
   font-family:"Great Vibes", cursive; font-weight:400;
   font-size:clamp(40px, 9.6vw, 86px);
-  line-height:.98; margin:-.02em 0 .06em;
+  line-height:1.3; margin:.02em 0 .08em;
   /* one consistent rose, top-lit — every letter reads the same (no per-glyph
      colour shift, which is what made the old rose→gold version look messy).
      Deep enough to hold up against the tree's bright bloom behind it. */
@@ -382,7 +383,7 @@ body{
   filter:
     drop-shadow(0 1px 1px rgba(255,252,248,.98))
     drop-shadow(0 2px 6px rgba(130,18,55,.45));
-  clip-path:inset(0 100% -28% -10%);
+  clip-path:inset(-.12em 100% -.32em -.1em);
   transform-origin:8% 60%;             /* breathe from the start of the line */
 }
 .wish__rule{
@@ -394,7 +395,7 @@ body{
 }
 .wish__sub{
   font-family:"Cormorant Garamond", Georgia, serif;
-  font-weight:600; font-size:clamp(12px, 2.9vw, 20px);
+  font-weight:600; font-size:clamp(12px, 2.9vw, 20px); line-height:1.4;
   letter-spacing:.03em; color:#6e3f4a;
   text-shadow:0 1px 2px #fff8f1, 0 0 8px rgba(255,248,241,.98);
 }
@@ -416,7 +417,7 @@ body{
 @keyframes wishBreath{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.02); } }
 .wish.is-in .wish__heroWrap::before{ animation:hlin .8s ease .3s forwards, hlpulse 3.4s ease-in-out 1.7s infinite; }
 .wish.is-in .wish__heroWrap::after{ animation:twk 2.6s ease-in-out 1.6s infinite; }
-@keyframes write{ from{ clip-path:inset(0 100% -28% -10%); } to{ clip-path:inset(0 -10% -28% -10%); } }
+@keyframes write{ from{ clip-path:inset(-.12em 100% -.32em -.1em); } to{ clip-path:inset(-.12em -.1em -.32em -.1em); } }
 @keyframes sheen{ 0%,18%{ background-position:0% 50%; } 60%,100%{ background-position:100% 50%; } }
 @keyframes hlin{ from{ opacity:0; transform:scale(.86); } to{ opacity:.92; transform:scale(1); } }
 @keyframes hlpulse{ 0%,100%{ opacity:.72; } 50%{ opacity:1; } }

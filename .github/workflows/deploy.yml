@@ -1,10 +1,6 @@
 name: Deploy to GitHub Pages
 
-# Build the Vite site and publish dist/ — NOT the raw source. Serving the
-# source directly (the old "Pages from branch: main /" setting) is exactly what
-# broke the site: the browser hit the un-bundled `import 'gsap'` and the film
-# never ran. This builds first, so gsap is bundled and every asset carries the
-# /happy-birthday-tree/ base path.
+# Build the Vite site and publish the generated dist/ directory.
 
 on:
   push:
@@ -29,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build

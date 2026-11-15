@@ -3,17 +3,17 @@
    Created & Owned by Vivek Kumar
    Vanilla canvas 2D for the tree + GSAP for the orchestration.
 
-   ACT 1  a real recurve bow with a Cupid's arrow nocked — you
+     ACT 1  a real recurve bow with a rose-tipped arrow nocked — you
           DRAW the string down and RELEASE to fire (pointer drag,
-          or keyboard). A softly beating heart waits above as the
+       or keyboard). A softly beating rose waits above as the
           target.
-   ACT 2  the arrow flies up and strikes the heart; the heart
+     ACT 2  the arrow flies up and strikes the rose; the rose
           jolts, falls, and bursts into a flood of rose that
           swallows the frame (no cross-fade).
    ACT 3  a kinetic wish hinges up out of that colour, glyph by
           glyph, under cinema bars and a slow camera push.
-   ACT 4  a gold light blooms, and the tree grows into one heart
-          of lit blossoms with the hand-lettered wish.
+     ACT 4  a gold light blooms, and the tree grows into a crown
+       of roses with the hand-lettered wish.
 
    A GSAP master timeline runs the shot + Acts 2–3; at its end it
    starts the canvas tree (Act 4), which owns its own rAF and
@@ -254,40 +254,52 @@ const T = {
 
 const SS = 168;
 
-function heartShape(c, x, top, w, h){
-  c.beginPath();
-  c.moveTo(x, top + h * 0.28);
-  c.bezierCurveTo(x, top, x - w * 0.5, top, x - w * 0.5, top + h * 0.28);
-  c.bezierCurveTo(x - w * 0.5, top + h * 0.60, x - w * 0.16, top + h * 0.80, x, top + h);
-  c.bezierCurveTo(x + w * 0.16, top + h * 0.80, x + w * 0.5, top + h * 0.60, x + w * 0.5, top + h * 0.28);
-  c.bezierCurveTo(x + w * 0.5, top, x, top, x, top + h * 0.28);
-  c.closePath();
-}
-
 function makeBlossom({ c0, c1 }, soft){
   const cv = document.createElement('canvas'); cv.width = cv.height = SS;
   const c = cv.getContext('2d');
-  const w = SS * 0.62, h = SS * 0.58, x = SS / 2, top = SS * 0.17;
+  const x = SS / 2, y = SS * 0.45;
 
   c.save();
   c.shadowColor = 'rgba(150,38,72,0.32)';
-  c.shadowBlur = SS * 0.085; c.shadowOffsetY = SS * 0.05;
-  c.fillStyle = c1; heartShape(c, x, top, w, h); c.fill();
+  c.shadowBlur = SS * 0.085; c.shadowOffsetY = SS * 0.035;
+  c.fillStyle = shade(c1, -24);
+  c.beginPath(); c.arc(x, y, SS * 0.29, 0, Math.PI * 2); c.fill();
   c.restore();
 
-  const g = c.createRadialGradient(x - w * 0.20, top + h * 0.20, h * 0.04, x, top + h * 0.42, h * 0.92);
-  g.addColorStop(0, c0); g.addColorStop(0.55, c1); g.addColorStop(1, shade(c1, -26));
-  heartShape(c, x, top, w, h); c.fillStyle = g; c.fill();
+  const leaf = c.createLinearGradient(x, y + 20, x, y + 65);
+  leaf.addColorStop(0, '#85a95d'); leaf.addColorStop(1, '#3f7141');
+  c.fillStyle = leaf;
+  c.beginPath(); c.moveTo(x - 5, y + 34); c.bezierCurveTo(x - 38, y + 24, x - 43, y + 48, x - 14, y + 52); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(x + 5, y + 34); c.bezierCurveTo(x + 38, y + 24, x + 43, y + 48, x + 14, y + 52); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.32)'; c.lineWidth = 1.4;
+  c.beginPath(); c.moveTo(x - 36, y + 37); c.lineTo(x - 13, y + 46); c.moveTo(x + 36, y + 37); c.lineTo(x + 13, y + 46); c.stroke();
 
-  c.save(); heartShape(c, x, top, w, h); c.clip();
-  const g2 = c.createLinearGradient(0, top, 0, top + h);
-  g2.addColorStop(0, 'rgba(255,255,255,0)');
-  g2.addColorStop(0.65, 'rgba(110,16,46,0)');
-  g2.addColorStop(1, 'rgba(110,16,46,0.26)');
-  c.fillStyle = g2; c.fillRect(0, 0, SS, SS);
-  c.globalAlpha = 0.55; c.fillStyle = '#ffffff';
-  c.beginPath(); c.ellipse(x - w * 0.15, top + h * 0.24, w * 0.17, h * 0.11, -0.5, 0, Math.PI * 2); c.fill();
-  c.restore();
+  const petal = (px, py, rx, ry, rotation) => {
+    c.save(); c.translate(px, py); c.rotate(rotation);
+    const gradient = c.createLinearGradient(-rx, -ry, rx, ry);
+    gradient.addColorStop(0, c0); gradient.addColorStop(0.56, c1); gradient.addColorStop(1, shade(c1, -25));
+    c.fillStyle = gradient; c.strokeStyle = `rgba(130,24,58,.24)`; c.lineWidth = 1.1;
+    c.beginPath(); c.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.globalAlpha = 0.28; c.strokeStyle = '#fff5ed'; c.lineWidth = 1.6;
+    c.beginPath(); c.ellipse(-rx * 0.2, -ry * 0.18, rx * 0.5, ry * 0.66, 0, Math.PI * 1.12, Math.PI * 1.82); c.stroke();
+    c.restore();
+  };
+
+  const ring = (count, radius, rx, ry, offset = 0) => {
+    for (let i = 0; i < count; i++){
+      const angle = offset + i * Math.PI * 2 / count;
+      petal(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, rx, ry, angle + Math.PI / 2);
+    }
+  };
+
+  ring(9, SS * 0.115, SS * 0.105, SS * 0.17, -Math.PI / 2);
+  ring(7, SS * 0.065, SS * 0.09, SS * 0.135, -Math.PI / 2 + 0.2);
+  ring(5, SS * 0.025, SS * 0.07, SS * 0.105, -Math.PI / 2 + 0.45);
+  const center = c.createRadialGradient(x - 4, y - 8, 1, x, y, SS * 0.095);
+  center.addColorStop(0, c0); center.addColorStop(0.65, c1); center.addColorStop(1, shade(c1, -30));
+  c.fillStyle = center; c.beginPath(); c.arc(x, y, SS * 0.09, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = shade(c1, -27); c.lineWidth = 2.6; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(x + 7, y - 7); c.bezierCurveTo(x - 10, y - 15, x - 12, y + 8, x + 2, y + 10); c.bezierCurveTo(x + 13, y + 10, x + 12, y - 3, x + 3, y - 2); c.stroke();
 
   if (!soft) return cv;
 
@@ -340,21 +352,21 @@ function drawSprite(sprite, x, y, size, rot, alpha){
   ctx.restore();
 }
 
-let heartPoly = null;
-function buildHeartPoly(){
+let canopyPoly = null;
+function buildCanopyPoly(){
   const raw = []; let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
   for (let i = 0; i <= 160; i++){
     const t = (i / 160) * Math.PI * 2;
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+    const x = Math.cos(t) * (1 + 0.035 * Math.cos(5 * t));
+    const y = Math.sin(t) * (1 + 0.035 * Math.cos(5 * t));
     raw.push([x, y]);
     if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
   }
   const midX = (minX + maxX) / 2, midY = (minY + maxY) / 2, hw = (maxX - minX) / 2, hh = (maxY - minY) / 2;
-  heartPoly = raw.map(([x, y]) => [(x - midX) / hw, (y - midY) / hh]);
+  canopyPoly = raw.map(([x, y]) => [(x - midX) / hw, (y - midY) / hh]);
 }
 function pointInPoly(x, y){
-  let inside = false; const p = heartPoly;
+  let inside = false; const p = canopyPoly;
   for (let i = 0, j = p.length - 1; i < p.length; j = i++){
     const xi = p[i][0], yi = p[i][1], xj = p[j][0], yj = p[j][1];
     if (((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi)) inside = !inside;
@@ -364,7 +376,7 @@ function pointInPoly(x, y){
 
 let W = 0, H = 0, dpr = 1;
 let cx = 0, cy = 0, rx = 0, ry = 0, groundY = 0;
-let branches = [], hearts = [], petals = [], rested = [], orbs = [], floaters = [], twinkles = [];
+let branches = [], roses = [], petals = [], rested = [], orbs = [], floaters = [], twinkles = [];
 let bgGrad = null, glowGrad = null, groundGrad = null;
 
 const quad = (b, t) => { const m = 1 - t, a = m * m, k = 2 * m * t, d = t * t; return { x: a * b.x1 + k * b.cx + d * b.x2, y: a * b.y1 + k * b.cy + d * b.y2 }; };
@@ -377,8 +389,8 @@ function barkGrad(x1, y1, x2, y2, depth){
 }
 
 function buildScene(){
-  branches = []; hearts = []; petals = []; rested = []; twinkles = []; orbs = []; floaters = [];
-  buildHeartPoly();
+  branches = []; roses = []; petals = []; rested = []; twinkles = []; orbs = []; floaters = [];
+  buildCanopyPoly();
 
   const wide = W / H > 1.2;
   cx = W * (wide ? 0.57 : 0.5);
@@ -458,7 +470,7 @@ function buildScene(){
   const COUNT = Math.round(clamp(rx * ry / 56, 250, 440));
   const baseBox = clamp(Math.min(W, H) * 0.115, 30, 74);
   let guard = 0;
-  while (hearts.length < COUNT && guard < COUNT * 50){
+  while (roses.length < COUNT && guard < COUNT * 50){
     guard++;
     const u = rand(-1.06, 1.06), v = rand(-1.06, 1.06);
     if (!pointInPoly(u, v)) continue;
@@ -466,9 +478,9 @@ function buildScene(){
     const d = clamp01(Math.hypot(u, v + 1) / 2.4);
     const t0 = T.bloomT0 + d * (T.bloomSpan * 0.82) + rand(0, T.bloomSpan * 0.18);
     const soft = Math.random() < 0.42;
-    hearts.push({ x, y, idx: (Math.random() * BLOSSOM.length) | 0, soft, box: baseBox * (soft ? rand(0.6, 0.85) : rand(0.78, 1.12)), rot: rand(-0.55, 0.55), sway: rand(0, 6.28), t0 });
+    roses.push({ x, y, idx: (Math.random() * BLOSSOM.length) | 0, soft, box: baseBox * (soft ? rand(0.6, 0.85) : rand(0.78, 1.12)), rot: rand(-0.55, 0.55), sway: rand(0, 6.28), t0 });
   }
-  hearts.sort((a, b) => (a.soft === b.soft ? a.y - b.y : a.soft ? -1 : 1));
+  roses.sort((a, b) => (a.soft === b.soft ? a.y - b.y : a.soft ? -1 : 1));
 }
 
 function drawBackground(){
@@ -553,9 +565,9 @@ function drawBranches(t){
   }
 }
 
-function drawHearts(t){
+function drawRoses(t){
   const breathe = 1 + Math.sin(t * 0.8) * 0.012;
-  for (const h of hearts){
+  for (const h of roses){
     const p = clamp01((t - h.t0) / 0.6);
     if (p <= 0) continue;
     const scale = Math.max(0, easeOutBack(p));
@@ -572,7 +584,7 @@ function drawHearts(t){
 function updateTwinkles(t, dt){
   const active = t > T.bloomT0 + T.bloomSpan * 0.45;
   if (active && twinkles.length < 9 && Math.random() < 0.5){
-    const h = hearts[(Math.random() * hearts.length) | 0];
+    const h = roses[(Math.random() * roses.length) | 0];
     if (h) twinkles.push({ x: h.x, y: h.y, size: rand(0.6, 1.3) * (Math.min(W, H) * 0.05), age: 0, life: rand(0.7, 1.2), rot: rand(0, 6.28) });
   }
   ctx.save(); ctx.globalCompositeOperation = 'lighter';
@@ -587,7 +599,7 @@ function updateTwinkles(t, dt){
 }
 
 function spawnPetal(){
-  const h = hearts[(Math.random() * hearts.length) | 0];
+  const h = roses[(Math.random() * roses.length) | 0];
   if (!h) return;
   petals.push({ x: h.x + rand(-8, 8), y: h.y + rand(-8, 8), vy: rand(14, 30), vx: rand(-8, 8), sway: rand(0.6, 1.4), phase: rand(0, 6.28), box: h.box * rand(0.34, 0.6), idx: h.idx, rot: rand(0, 6.28), vrot: rand(-1.4, 1.4), age: 0, land: groundY + rand(-6, H * 0.05) });
 }
@@ -628,7 +640,7 @@ function treeFrame(now){
   drawBokeh(t, dt);
   drawFloaters(t, dt, false);
   drawBranches(t);
-  drawHearts(t);
+  drawRoses(t);
   updateTwinkles(t, dt);
   if (t > T.petalT0 && now - lastPetal > 150){ spawnPetal(); spawnPetal(); lastPetal = now; }
   drawPetals(t, dt);
@@ -657,8 +669,8 @@ function treeStop(){
 function drawFinal(){
   buildScene();
   drawBackground(); drawGodRays(0, 1); drawGlow(T.done); drawBokeh(0, 0); drawFloaters(99, 0, false);
-  drawBranches(99); drawHearts(99);
-  for (let i = 0; i < 40; i++){ const h = hearts[(Math.random() * hearts.length) | 0]; if (h) rested.push({ x: clamp(h.x + rand(-W * 0.3, W * 0.3), 6, W - 6), y: groundY + rand(-6, H * 0.05), box: h.box * 0.5, idx: h.idx, rot: rand(0, 6.28), a: 0.85 }); }
+  drawBranches(99); drawRoses(99);
+  for (let i = 0; i < 40; i++){ const h = roses[(Math.random() * roses.length) | 0]; if (h) rested.push({ x: clamp(h.x + rand(-W * 0.3, W * 0.3), 6, W - 6), y: groundY + rand(-6, H * 0.05), box: h.box * 0.5, idx: h.idx, rot: rand(0, 6.28), a: 0.85 }); }
   drawRested(); drawFloaters(99, 0, true);
   showWish(true);
   window.bdayDone = true;
@@ -776,9 +788,9 @@ function startBeat(){
 }
 function stopBeat(){ if (beatTL){ beatTL.kill(); beatTL = null; } gsap.set(targetHeart, { scale: 1 }); }
 
-/* a little burst of hearts + sparks where the arrow strikes */
-function miniHeartSVG(fill){
-  return `<svg viewBox="0 0 24 22" width="100%" height="100%"><path d="M12 20C5.5 15 1.5 11.4 1.5 6.9 1.5 3.6 4 1.5 7 1.5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3 0 5.5 2.1 5.5 5.4C23.5 11.4 19.5 15 12 20Z" fill="${fill}"/></svg>`;
+/* a little burst of roses + sparks where the arrow strikes */
+function miniRoseSVG(fill){
+  return `<svg viewBox="0 0 32 32" width="100%" height="100%" aria-hidden="true"><g fill="${fill}" stroke="#9d1745" stroke-width=".65"><ellipse cx="16" cy="10" rx="4.2" ry="7"/><ellipse cx="16" cy="10" rx="4.2" ry="7" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10" rx="4.2" ry="7" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10" rx="4.2" ry="7" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10" rx="4.2" ry="7" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10" rx="4.2" ry="7" transform="rotate(300 16 16)"/></g><circle cx="16" cy="16" r="4.2" fill="#a81542"/><path d="M14 16c0-3 4-4 5-1 1 2-1 4-3 3" fill="none" stroke="#ffd0d8" stroke-width="1.3" stroke-linecap="round"/><path d="m12 22-5 5 7-2 2-4m4 1 5 5-7-2-2-4" fill="#63834b" stroke="#49683f" stroke-width=".8" stroke-linejoin="round"/></svg>`;
 }
 function burstHearts(){
   const r = target.getBoundingClientRect();
@@ -789,22 +801,22 @@ function burstHearts(){
   const frag = document.createDocumentFragment();
   const nodes = [];
   for (let i = 0; i < 12; i++){
-    const heart = i < 8;
+    const rose = i < 8;
     const el = document.createElement('span');
     el.className = 'burst';
-    const s = heart ? rand(12, 22) : rand(4, 8);
+    const s = rose ? rand(12, 22) : rand(4, 8);
     el.style.cssText = `position:absolute;left:${ox}px;top:${oy}px;width:${s}px;height:${s}px;margin:${-s / 2}px 0 0 ${-s / 2}px;pointer-events:none;z-index:4;`;
-    if (heart) el.innerHTML = miniHeartSVG(pick(cols));
+    if (rose) el.innerHTML = miniRoseSVG(pick(cols));
     else { el.style.borderRadius = '50%'; el.style.background = 'radial-gradient(circle,#fff,rgba(255,210,150,0) 70%)'; }
-    frag.appendChild(el); nodes.push({ el, heart });
+    frag.appendChild(el); nodes.push({ el, rose });
   }
   hero.appendChild(frag);
-  nodes.forEach(({ el, heart }) => {
+  nodes.forEach(({ el, rose }) => {
     const ang = rand(-Math.PI, 0);                       // fan upward + out
-    const dist = rand(heart ? 70 : 40, heart ? 190 : 120);
+    const dist = rand(rose ? 70 : 40, rose ? 190 : 120);
     gsap.to(el, {
       x: Math.cos(ang) * dist, y: Math.sin(ang) * dist - rand(10, 50),
-      rotation: rand(-120, 120), scale: heart ? rand(0.7, 1.2) : rand(0.4, 1),
+      rotation: rand(-120, 120), scale: rose ? rand(0.7, 1.2) : rand(0.4, 1),
       duration: rand(0.7, 1.15), ease: 'power2.out',
     });
     gsap.to(el, { opacity: 0, duration: 0.5, delay: rand(0.35, 0.6), ease: 'power1.in', onComplete: () => el.remove() });
